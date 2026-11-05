@@ -1,0 +1,6 @@
+{
+  "name": "QuestPDF - AI MCQ Practice & Performance Dashboard",
+  "description": "Upload any PDF to instantly generate custom multiple-choice quizzes with in-depth reasoning explanations, timed/untimed practice modes, and a historical performance analytics dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
