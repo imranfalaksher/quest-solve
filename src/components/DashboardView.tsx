@@ -272,7 +272,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Table Content */}
+        {/* Table / Card Content */}
         {filteredAttempts.length === 0 ? (
           <div className="text-center py-12 p-6">
             <FileText className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
@@ -284,125 +284,199 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </p>
             <button
               onClick={onOpenNewQuiz}
-              className="mt-4 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer"
+              className="mt-4 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer min-h-[40px]"
             >
               Generate First Quiz
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-                  <th className="py-3 px-5">Date & Time</th>
-                  <th className="py-3 px-5">Quiz Title & Document</th>
-                  <th className="py-3 px-5">Questions</th>
-                  <th className="py-3 px-5">Format</th>
-                  <th className="py-3 px-5">Score & Accuracy</th>
-                  <th className="py-3 px-5">Time Spent</th>
-                  <th className="py-3 px-5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-                {filteredAttempts.map((att) => {
-                  const isMastered = att.percentage >= 80;
+          <>
+            {/* Desktop / Tablet Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 uppercase font-semibold">
+                    <th className="py-3 px-5">Date & Time</th>
+                    <th className="py-3 px-5">Quiz Title & Document</th>
+                    <th className="py-3 px-5">Questions</th>
+                    <th className="py-3 px-5">Format</th>
+                    <th className="py-3 px-5">Score & Accuracy</th>
+                    <th className="py-3 px-5">Time Spent</th>
+                    <th className="py-3 px-5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
+                  {filteredAttempts.map((att) => {
+                    const isMastered = att.percentage >= 80;
 
-                  return (
-                    <tr
-                      key={att.id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
-                    >
-                      {/* Date */}
-                      <td className="py-3.5 px-5 whitespace-nowrap text-slate-500 dark:text-slate-400">
-                        {new Date(att.date).toLocaleDateString()}{' '}
-                        <span className="text-[11px] font-mono">
-                          {new Date(att.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </td>
-
-                      {/* Title & Doc */}
-                      <td className="py-3.5 px-5 max-w-xs">
-                        <button
-                          onClick={() => onReviewAttempt(att)}
-                          className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left truncate block max-w-xs cursor-pointer"
-                        >
-                          {att.title}
-                        </button>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate block">
-                          {att.sourceDocName}
-                        </span>
-                      </td>
-
-                      {/* Question count */}
-                      <td className="py-3.5 px-5 font-mono tabular-nums whitespace-nowrap">
-                        {att.totalQuestions} MCQs
-                      </td>
-
-                      {/* Format */}
-                      <td className="py-3.5 px-5 whitespace-nowrap">
-                        <span className="text-[11px] text-slate-600 dark:text-slate-400">
-                          {att.mode === 'timed' ? 'Timed Exam' : 'Untimed Practice'}
-                        </span>
-                      </td>
-
-                      {/* Score */}
-                      <td className="py-3.5 px-5 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`font-mono font-bold text-sm tabular-nums ${
-                              isMastered
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : att.percentage >= 60
-                                ? 'text-indigo-600 dark:text-indigo-400'
-                                : 'text-rose-600 dark:text-rose-400'
-                            }`}
-                          >
-                            {att.percentage}%
+                    return (
+                      <tr
+                        key={att.id}
+                        className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
+                      >
+                        {/* Date */}
+                        <td className="py-3.5 px-5 whitespace-nowrap text-slate-600 dark:text-slate-300">
+                          {new Date(att.date).toLocaleDateString()}{' '}
+                          <span className="text-[11px] font-mono text-slate-500">
+                            {new Date(att.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
-                          <span className="text-[11px] text-slate-500 font-mono">
-                            ({att.score}/{att.totalQuestions})
-                          </span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Time spent */}
-                      <td className="py-3.5 px-5 font-mono tabular-nums whitespace-nowrap text-slate-600 dark:text-slate-400">
-                        {formatDuration(att.timeSpentSeconds)}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3.5 px-5 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        {/* Title & Doc */}
+                        <td className="py-3.5 px-5 max-w-xs">
                           <button
                             onClick={() => onReviewAttempt(att)}
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded transition-colors cursor-pointer"
+                            className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left truncate block max-w-xs cursor-pointer"
                           >
-                            Review
+                            {att.title}
                           </button>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate block">
+                            {att.sourceDocName}
+                          </span>
+                        </td>
 
-                          <button
-                            onClick={() => onRetakeAttempt(att)}
-                            title="Retake Quiz"
-                            className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded transition-colors cursor-pointer"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Question count */}
+                        <td className="py-3.5 px-5 font-mono tabular-nums whitespace-nowrap text-slate-900 dark:text-slate-100 font-semibold">
+                          {att.totalQuestions} MCQs
+                        </td>
 
-                          <button
-                            onClick={() => onDeleteAttempt(att.id)}
-                            title="Delete Record"
-                            className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        {/* Format */}
+                        <td className="py-3.5 px-5 whitespace-nowrap">
+                          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                            {att.mode === 'timed' ? 'Timed Exam' : 'Untimed Practice'}
+                          </span>
+                        </td>
+
+                        {/* Score */}
+                        <td className="py-3.5 px-5 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`font-mono font-bold text-sm tabular-nums ${
+                                isMastered
+                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  : att.percentage >= 60
+                                  ? 'text-indigo-600 dark:text-indigo-400'
+                                  : 'text-rose-600 dark:text-rose-400'
+                              }`}
+                            >
+                              {att.percentage}%
+                            </span>
+                            <span className="text-[11px] text-slate-500 font-mono">
+                              ({att.score}/{att.totalQuestions})
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Time spent */}
+                        <td className="py-3.5 px-5 font-mono tabular-nums whitespace-nowrap text-slate-700 dark:text-slate-300">
+                          {formatDuration(att.timeSpentSeconds)}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3.5 px-5 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => onReviewAttempt(att)}
+                              className="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded transition-colors cursor-pointer min-h-[32px]"
+                            >
+                              Review
+                            </button>
+
+                            <button
+                              onClick={() => onRetakeAttempt(att)}
+                              title="Retake Quiz"
+                              className="p-1.5 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded transition-colors cursor-pointer min-h-[32px] min-w-[32px]"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => onDeleteAttempt(att.id)}
+                              title="Delete Record"
+                              className="p-1.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 rounded transition-colors cursor-pointer min-h-[32px] min-w-[32px]"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Dedicated Card List View */}
+            <div className="block md:hidden divide-y divide-slate-200 dark:divide-slate-800">
+              {filteredAttempts.map((att) => {
+                const isMastered = att.percentage >= 80;
+
+                return (
+                  <div key={att.id} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3
+                          onClick={() => onReviewAttempt(att)}
+                          className="font-bold text-sm text-slate-900 dark:text-white truncate cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400"
+                        >
+                          {att.title}
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {att.sourceDocName}
+                        </p>
+                      </div>
+
+                      <div
+                        className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-sm shrink-0 ${
+                          isMastered
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                            : att.percentage >= 60
+                            ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
+                            : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+                        }`}
+                      >
+                        {att.percentage}%
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 flex-wrap gap-1">
+                      <span>{att.totalQuestions} MCQs · {att.mode === 'timed' ? 'Timed Exam' : 'Untimed Practice'}</span>
+                      <span className="font-mono">{formatDuration(att.timeSpentSeconds)}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                      <span className="text-[11px] text-slate-400">
+                        {new Date(att.date).toLocaleDateString()}
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => onReviewAttempt(att)}
+                          className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer min-h-[36px]"
+                        >
+                          Review Quiz
+                        </button>
+                        <button
+                          onClick={() => onRetakeAttempt(att)}
+                          aria-label="Retake Quiz"
+                          className="p-2 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-h-[36px] min-w-[36px]"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onDeleteAttempt(att.id)}
+                          aria-label="Delete Quiz"
+                          className="p-2 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-h-[36px] min-w-[36px]"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
 

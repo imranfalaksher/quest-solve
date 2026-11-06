@@ -102,18 +102,18 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-3 shrink-0 print:hidden">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0 print:hidden">
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer min-h-[38px]"
           >
             <Printer className="w-4 h-4 text-slate-500" />
-            <span>Print Report</span>
+            <span className="hidden sm:inline">Print Report</span>
           </button>
 
           <button
             onClick={onRetake}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer min-h-[38px]"
           >
             <RotateCcw className="w-4 h-4 text-slate-500" />
             <span>Retake Quiz</span>
@@ -121,7 +121,7 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
 
           <button
             onClick={onBackToDashboard}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition-colors cursor-pointer min-h-[38px]"
           >
             <LayoutDashboard className="w-4 h-4" />
             <span>Dashboard</span>
@@ -132,9 +132,9 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
       {/* Score & Diagnostic Card */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Main Scorecard */}
-        <div className="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex items-center gap-6">
-          <div className="w-24 h-24 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-900 flex flex-col items-center justify-center shrink-0">
-            <span className="font-mono text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">
+        <div className="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col xs:flex-row items-start xs:items-center gap-4 sm:gap-6">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-900 flex flex-col items-center justify-center shrink-0">
+            <span className="font-mono text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">
               {attempt.percentage}%
             </span>
             <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
@@ -194,17 +194,17 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
       {/* Review Section */}
       <div className="space-y-4">
         {/* Filter Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
             <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Question Review & Pedagogical Reasonings</span>
           </div>
 
-          {/* Interactive filter segmented control */}
-          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+          {/* Interactive filter segmented control - Mobile scrollable */}
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-x-auto no-scrollbar max-w-full">
             <button
               onClick={() => setFilter('all')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 filter === 'all'
                   ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -215,7 +215,7 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
 
             <button
               onClick={() => setFilter('incorrect')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 filter === 'incorrect'
                   ? 'bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -226,7 +226,7 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
 
             <button
               onClick={() => setFilter('correct')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 filter === 'correct'
                   ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -237,7 +237,7 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
 
             <button
               onClick={() => setFilter('bookmarked')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 filter === 'bookmarked'
                   ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -334,20 +334,20 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
                       const isOptionCorrect = opt.id === q.correctAnswer;
                       const isOptionChosen = userChoice === opt.id;
 
-                      let optClass = 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 text-slate-700 dark:text-slate-300';
+                      let optClass = 'border-2 border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100';
                       let badge = null;
 
                       if (isOptionCorrect) {
-                        optClass = 'border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 ring-1 ring-emerald-500';
+                        optClass = 'border-2 border-emerald-500 bg-emerald-50/90 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-100 ring-1 ring-emerald-500';
                         badge = (
-                          <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 ml-auto whitespace-nowrap">
+                          <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 ml-auto whitespace-nowrap bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded">
                             Correct Answer
                           </span>
                         );
                       } else if (isOptionChosen && !isOptionCorrect) {
-                        optClass = 'border-rose-400 bg-rose-50/80 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100 ring-1 ring-rose-400';
+                        optClass = 'border-2 border-rose-500 bg-rose-50/90 dark:bg-rose-950/60 text-rose-950 dark:text-rose-100 ring-1 ring-rose-400';
                         badge = (
-                          <span className="text-[11px] font-bold text-rose-700 dark:text-rose-300 ml-auto whitespace-nowrap">
+                          <span className="text-[11px] font-bold text-rose-700 dark:text-rose-300 ml-auto whitespace-nowrap bg-rose-100 dark:bg-rose-900/60 px-2 py-0.5 rounded">
                             Your Answer
                           </span>
                         );
@@ -356,20 +356,22 @@ export const QuizResultsView: React.FC<QuizResultsViewProps> = ({
                       return (
                         <div
                           key={opt.id}
-                          className={`p-3 rounded-xl border flex items-start gap-3 text-xs sm:text-sm ${optClass}`}
+                          className={`p-3 sm:p-3.5 rounded-xl transition-all flex items-start gap-3 text-xs sm:text-sm ${optClass}`}
                         >
                           <span
-                            className={`w-6 h-6 rounded-md flex items-center justify-center font-bold font-mono text-xs shrink-0 ${
+                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-bold font-mono text-xs shrink-0 ${
                               isOptionCorrect
                                 ? 'bg-emerald-600 text-white'
                                 : isOptionChosen && !isOptionCorrect
                                 ? 'bg-rose-600 text-white'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600'
                             }`}
                           >
                             {opt.id}
                           </span>
-                          <span className="flex-1 pt-0.5 leading-relaxed">{opt.text}</span>
+                          <span className="flex-1 pt-0.5 leading-relaxed font-semibold text-slate-900 dark:text-white">
+                            {opt.text}
+                          </span>
                           {badge}
                         </div>
                       );

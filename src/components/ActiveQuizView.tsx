@@ -7,9 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Grid,
-  CheckCircle2,
   AlertTriangle,
-  Lightbulb,
   X,
   Send,
   RotateCcw
@@ -42,7 +40,6 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, OptionId>>({});
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
-  const [showExplanationUntimed, setShowExplanationUntimed] = useState<boolean>(false);
   
   // Timer states
   const [timeRemaining, setTimeRemaining] = useState<number>(initialTimeLimitSeconds);
@@ -121,7 +118,6 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setShowExplanationUntimed(false);
     } else {
       setShowSubmitConfirm(true);
     }
@@ -130,7 +126,6 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
-      setShowExplanationUntimed(false);
     }
   };
 
@@ -174,49 +169,51 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-between">
       {/* Top Test Header */}
-      <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3.5 shadow-xs">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-8 py-2.5 sm:py-3.5 shadow-xs">
+        {/* Desktop & Tablet Top Row */}
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Exit & Quiz Info */}
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => setShowExitConfirm(true)}
-              className="text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Exit quiz session"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center gap-1 p-2 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer min-h-[38px]"
             >
               <ChevronLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Exit Exam</span>
             </button>
 
-            <div className="border-l border-slate-200 dark:border-slate-800 pl-3 min-w-0">
-              <h1 className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-xs sm:max-w-md">
+            <div className="border-l border-slate-200 dark:border-slate-800 pl-2 sm:pl-3 min-w-0">
+              <h1 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate max-w-[140px] xs:max-w-[190px] sm:max-w-md">
                 {title}
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                <span>{sourceDocName}</span>
-                <span className="mx-1.5" aria-hidden="true">·</span>
-                <span>Question {currentIndex + 1} of {totalQuestions}</span>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+                <span>Q {currentIndex + 1} of {totalQuestions}</span>
+                <span className="mx-1" aria-hidden="true">·</span>
+                <span className="hidden xs:inline">{sourceDocName}</span>
               </p>
             </div>
           </div>
 
           {/* Right: Timer & Tools */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Timer Display */}
             {mode === 'timed' ? (
               <div
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-mono text-sm font-semibold tabular-nums ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border font-mono text-xs sm:text-sm font-bold tabular-nums min-h-[38px] ${
                   timeRemaining < 120
                     ? 'border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 animate-pulse'
                     : timeRemaining < 300
                     ? 'border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100'
                 }`}
               >
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>{formatTime(timeRemaining)}</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-sm tabular-nums">
-                <Compass className="w-4 h-4 text-indigo-500" />
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-mono text-xs sm:text-sm font-semibold tabular-nums min-h-[38px]">
+                <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
                 <span>{formatTime(elapsedSeconds)}</span>
               </div>
             )}
@@ -225,10 +222,10 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
             <button
               onClick={() => handleToggleBookmark(currentQuestion.id)}
               aria-label="Flag question for review"
-              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+              className={`p-2 rounded-lg border transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center ${
                 isCurrentBookmarked
                   ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'
-                  : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               {isCurrentBookmarked ? (
@@ -241,11 +238,11 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
             {/* Question Grid Drawer Toggle */}
             <button
               onClick={() => setShowGridModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 text-slate-800 dark:text-slate-100 transition-colors cursor-pointer min-h-[38px]"
             >
-              <Grid className="w-4 h-4 text-slate-500" />
+              <Grid className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />
               <span className="hidden sm:inline">Overview</span>
-              <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold ml-1">
+              <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
                 {answeredCount}/{totalQuestions}
               </span>
             </button>
@@ -253,7 +250,7 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
             {/* Quick Submit Button */}
             <button
               onClick={() => setShowSubmitConfirm(true)}
-              className="px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+              className="px-3 sm:px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-xs transition-colors cursor-pointer min-h-[38px]"
             >
               Submit
             </button>
@@ -261,7 +258,7 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
         </div>
 
         {/* Progress bar line */}
-        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 mt-3 rounded-full overflow-hidden">
+        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 sm:h-1.5 mt-2.5 sm:mt-3 rounded-full overflow-hidden">
           <div
             className="bg-indigo-600 h-full transition-all duration-300 ease-out"
             style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
@@ -270,16 +267,16 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
       </header>
 
       {/* Main Question Arena */}
-      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <main className="max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-4 sm:py-8 flex-1 pb-32 sm:pb-24">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-8 shadow-xs space-y-5 sm:space-y-6">
           {/* Question Meta Strip */}
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                Question {currentIndex + 1}
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 flex-wrap gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xs sm:text-sm">
+                Question {currentIndex + 1} of {totalQuestions}
               </span>
               <span aria-hidden="true">·</span>
-              <span>{currentQuestion.topicTag || 'Core Subject'}</span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{currentQuestion.topicTag || 'Core Subject'}</span>
               {currentQuestion.difficulty && (
                 <>
                   <span aria-hidden="true">·</span>
@@ -289,7 +286,7 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
             </div>
 
             {isCurrentBookmarked && (
-              <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+              <span className="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
                 <Bookmark className="w-3.5 h-3.5" />
                 Flagged for Review
               </span>
@@ -297,108 +294,67 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
           </div>
 
           {/* Question Text */}
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100 leading-relaxed balance-text">
+          <h2 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white leading-relaxed balance-text">
             {currentQuestion.question}
           </h2>
 
-          {/* 4 Multiple Choice Options */}
-          <div className="space-y-3 pt-2">
+          {/* 4 Multiple Choice Options - Enhanced High Contrast & Touch Targets */}
+          <div className="space-y-3 pt-1">
             {currentQuestion.options.map((option) => {
               const isSelected = currentSelectedOption === option.id;
               
-              // In untimed mode when showing explanation
-              const isCorrectAnswer = option.id === currentQuestion.correctAnswer;
-              let optionStyles = 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-850';
-
-              if (mode === 'untimed' && showExplanationUntimed) {
-                if (isCorrectAnswer) {
-                  optionStyles = 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100';
-                } else if (isSelected && !isCorrectAnswer) {
-                  optionStyles = 'border-rose-400 bg-rose-50/70 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100';
-                }
-              } else if (isSelected) {
-                optionStyles = 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-100 ring-1 ring-indigo-500';
-              }
+              const optionStyles = isSelected
+                ? 'border-2 border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/70 text-indigo-950 dark:text-white ring-2 ring-indigo-500/50 shadow-sm'
+                : 'border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-400 dark:hover:border-indigo-500 text-slate-900 dark:text-white shadow-xs';
 
               return (
                 <button
                   key={option.id}
+                  type="button"
                   onClick={() => handleSelectOption(option.id)}
-                  className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer ${optionStyles}`}
+                  className={`w-full text-left p-3.5 sm:p-4 rounded-xl transition-all flex items-start gap-3 sm:gap-4 cursor-pointer select-none active:scale-[0.99] min-h-[52px] ${optionStyles}`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold font-mono shrink-0 transition-colors ${
-                      mode === 'untimed' && showExplanationUntimed && isCorrectAnswer
-                        ? 'bg-emerald-600 text-white'
-                        : mode === 'untimed' && showExplanationUntimed && isSelected && !isCorrectAnswer
-                        ? 'bg-rose-600 text-white'
-                        : isSelected
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold font-mono shrink-0 transition-colors ${
+                      isSelected
                         ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600'
                     }`}
                   >
                     {option.id}
                   </div>
-                  <span className="text-sm sm:text-base text-slate-800 dark:text-slate-200 pt-0.5 leading-relaxed flex-1">
+                  <span className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white pt-0.5 leading-snug sm:leading-relaxed flex-1">
                     {option.text}
                   </span>
                 </button>
               );
             })}
           </div>
-
-          {/* Untimed Mode: Instant Explanation Accordion / Reveal */}
-          {mode === 'untimed' && (
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setShowExplanationUntimed(!showExplanationUntimed)}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 p-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
-              >
-                <Lightbulb className="w-4 h-4" />
-                <span>
-                  {showExplanationUntimed ? 'Hide Answer & Pedagogical Reasoning' : 'Reveal Answer & Pedagogical Reasoning'}
-                </span>
-              </button>
-
-              {showExplanationUntimed && (
-                <div className="mt-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 space-y-2 animate-in fade-in">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Correct Answer: Option {currentQuestion.correctAnswer}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                    {currentQuestion.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </main>
 
-      {/* Bottom Sticky Action Deck */}
-      <footer className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-3.5 px-4 sm:px-8">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+      {/* Bottom Sticky Action Deck - Fully responsive on mobile */}
+      <footer className="sticky bottom-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-3 px-3 sm:px-8 shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           {/* Previous button */}
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 dark:text-slate-200 transition-colors cursor-pointer min-h-[44px]"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Previous</span>
+            <span className="hidden xs:inline">Previous</span>
           </button>
 
-          {/* Middle: Clear answer or jump info */}
-          <div className="flex items-center gap-2">
+          {/* Middle: Clear answer */}
+          <div className="flex items-center justify-center">
             {currentSelectedOption && (
               <button
                 onClick={handleClearAnswer}
-                className="text-xs text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 flex items-center gap-1 px-2.5 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer min-h-[36px]"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Clear Selection</span>
+                <span>Clear</span>
               </button>
             )}
           </div>
@@ -407,17 +363,17 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
           {currentIndex < totalQuestions - 1 ? (
             <button
               onClick={handleNext}
-              className="flex items-center gap-1.5 px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors cursor-pointer min-h-[44px]"
             >
-              <span>Next Question</span>
+              <span>Next</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               onClick={() => setShowSubmitConfirm(true)}
-              className="flex items-center gap-1.5 px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-colors cursor-pointer min-h-[44px]"
             >
-              <span>Finish & Submit</span>
+              <span>Submit Exam</span>
               <Send className="w-4 h-4" />
             </button>
           )}
@@ -458,7 +414,6 @@ export const ActiveQuizView: React.FC<ActiveQuizViewProps> = ({
                     onClick={() => {
                       setCurrentIndex(idx);
                       setShowGridModal(false);
-                      setShowExplanationUntimed(false);
                     }}
                     className={`relative h-10 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                       isCurrent
