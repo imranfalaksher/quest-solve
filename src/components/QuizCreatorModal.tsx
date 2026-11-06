@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, UploadCloud, FileText, Check, Clock, Compass, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { SAMPLE_DOCUMENTS } from '../data/sampleDocs';
 import { MCQQuestion, QuizMode, SampleDoc } from '../types/quiz';
+import { extractTextFromPdf, synthesizeFallbackQuizFromText } from '../utils/pdfTextExtractor';
 
 interface QuizCreatorModalProps {
   isOpen: boolean;
@@ -158,61 +159,120 @@ export const QuizCreatorModal: React.FC<QuizCreatorModalProps> = ({
       return;
     }
 
-    // Otherwise, generate directly using Gemini 3.8 Flash via server endpoint
+    // Otherwise, generate using server/Cloudflare endpoint with seamless browser text extraction fallback
     try {
       setIsLoading(true);
-      setLoadingStep('Ingesting PDF document structure into Gemini...');
+      setLoadingStep('Parsing document content and extracting text...');
+
+      // Extract text in the browser to accelerate server processing and serve as resilient fallback
+      let extractedText = '';
+      if (selectedFile) {
+        try {
+          extractedText = await extractTextFromPdf(selectedFile);
+        } catch (extractErr) {
+          console.warn('Browser text extraction warning:', extractErr);
+        }
+      }
+
+      setLoadingStep('Ingesting PDF into Gemini assessment engine...');
 
       const stepTimer1 = setTimeout(() => {
-        setLoadingStep('Extracting key concepts, theorems, and definitions...');
-      }, 1800);
+        setLoadingStep('Analyzing core theorems, concepts, and relationships...');
+      }, 1500);
 
       const stepTimer2 = setTimeout(() => {
-        setLoadingStep(`Generating ${questionCount} MCQs with pedagogical reasoning...`);
-      }, 3800);
+        setLoadingStep(`Synthesizing ${questionCount} MCQs with pedagogical explanations...`);
+      }, 3500);
 
-      const response = await fetch('/api/generate-mcqs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pdfBase64: fileBase64,
-          pdfName: selectedFile?.name || 'Document.pdf',
-          quantity: questionCount,
-          difficulty,
-          focusTopics: focusTopics.trim() || undefined,
-        }),
-      });
+      let data: any = null;
+      let apiFailed = false;
+      let apiErrorMessage = '';
 
-      clearTimeout(stepTimer1);
-      clearTimeout(stepTimer2);
-
-      const responseText = await response.text();
-      let data: any;
       try {
-        data = JSON.parse(responseText);
-      } catch {
-        console.error('Non-JSON response received:', responseText.slice(0, 300));
+        const response = await fetch('/api/generate-mcqs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pdfBase64: fileBase64,
+            pdfName: selectedFile?.name || 'Document.pdf',
+            pdfText: extractedText ? extractedText.slice(0, 30000) : undefined,
+            quantity: questionCount,
+            difficulty,
+            focusTopics: focusTopics.trim() || undefined,
+          }),
+        });
+
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+
+        const responseText = await response.text();
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          // If server returned HTML (e.g. 404 Not Found or Cloudflare SPA page)
+          apiFailed = true;
+          apiErrorMessage = response.status === 404
+            ? 'Backend API route not found on this host. Running local document synthesis...'
+            : 'Server returned a non-JSON response.';
+        }
+
+        if (response.ok && data?.success && Array.isArray(data.questions) && data.questions.length > 0) {
+          // Successfully generated via Gemini API
+          setIsLoading(false);
+          onStartQuiz({
+            title: `${(selectedFile?.name || 'Document').replace(/\.pdf$/i, '')} Practice Quiz`,
+            sourceDocName: selectedFile?.name || 'Document.pdf',
+            questions: data.questions,
+            mode,
+            timeLimitSeconds,
+          });
+          return;
+        } else if (data?.error) {
+          apiFailed = true;
+          apiErrorMessage = data.error;
+        }
+      } catch (networkErr: any) {
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+        apiFailed = true;
+        apiErrorMessage = networkErr.message || 'Network connection failed.';
+      }
+
+      // If backend API failed (e.g. Cloudflare Pages static hosting without serverless functions or missing GEMINI_API_KEY):
+      if (apiFailed) {
+        // If the error specifically informs about missing GEMINI_API_KEY, display it clearly
+        if (apiErrorMessage.includes('GEMINI_API_KEY')) {
+          throw new Error(apiErrorMessage);
+        }
+
+        // Fallback: If we have text from the user's PDF, synthesize the practice quiz client-side!
+        if (extractedText && extractedText.length > 50) {
+          setLoadingStep('Synthesizing practice MCQs from document text...');
+          const fallbackQuestions = synthesizeFallbackQuizFromText(
+            extractedText,
+            selectedFile?.name || 'Study Document',
+            questionCount,
+            difficulty
+          );
+
+          setIsLoading(false);
+          onStartQuiz({
+            title: `${(selectedFile?.name || 'Document').replace(/\.pdf$/i, '')} Practice Quiz`,
+            sourceDocName: selectedFile?.name || 'Document.pdf',
+            questions: fallbackQuestions,
+            mode,
+            timeLimitSeconds,
+          });
+          return;
+        }
+
+        // If no text could be extracted and API was unreachable:
         throw new Error(
-          response.status === 413
-            ? 'The uploaded PDF exceeds the network size limit. Please upload a smaller PDF or try one of the curated curricula.'
-            : response.status >= 500
-            ? 'The AI model is temporarily experiencing high demand. Please try again with fewer questions or select a sample document.'
-            : 'Unable to reach the question generator. Please check your network and try again.'
+          apiErrorMessage.includes('Cloudflare')
+            ? apiErrorMessage
+            : 'Unable to reach the question generator API. For Cloudflare Pages, make sure GEMINI_API_KEY is configured in your project settings, or select one of our curated curricula.'
         );
       }
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to generate MCQs from document.');
-      }
-
-      setIsLoading(false);
-      onStartQuiz({
-        title: `${(selectedFile?.name || 'Document').replace(/\.pdf$/i, '')} Practice Quiz`,
-        sourceDocName: selectedFile?.name || 'Document.pdf',
-        questions: data.questions,
-        mode,
-        timeLimitSeconds,
-      });
     } catch (err: any) {
       setIsLoading(false);
       console.error('Quiz generation failed:', err);
